@@ -61,8 +61,8 @@ setup(
     },
     packages=find_packages(),
     install_requires=[
-        'cupy-cuda13x>=13.6.0,<14',
-        'noregret~=0.0.0.dev2',
+        'cupy-cuda12x>=13.6.0,<14',
+        'noregret @ git+https://github.com/Vieloooo/noregret.git',
         'numpy>=2.0,<3',
         'scipy>=1.14.0,<2',
     ],
