@@ -14,6 +14,19 @@ import seaborn as sns
 
 
 def parse_args():
+    """
+    解析命令行参数。
+    
+    参数说明:
+    - game_path: 博弈文件路径 (通常是 json 或类似格式)。
+    - game_import_string: 导入 Game 类的字符串 (例如 gpugt.games.TwoPlayerZeroSumExtensiveFormGame)。
+    - regret_minimizer_import_string: 导入 RegretMinimizer 类的字符串 (例如 gpugt.regret_minimizers.CounterfactualRegretMinimization)。
+    - iteration_count: CFR 迭代次数 T。
+    - alternate: 是否交替更新策略 (Alternating Updates) 而不是同时更新。
+    - exploitabilities: 记录可利用度 (Exploitability) 的输出路径。
+    - values: 记录博弈价值 (Value) 的输出路径。
+    - game_name: 博弈名称 (可选)。
+    """
     parser = ArgumentParser()
     parser.add_argument('game_path', type=Path)
     parser.add_argument('game_import_string')
@@ -28,6 +41,24 @@ def parse_args():
 
 
 def main():
+    """
+    主求解程序入口。
+    
+    核心流程:
+    1. 加载博弈 (Game) 和 后悔最小化器 (Regret Minimizer, 如 CFR)。
+    2. 初始化行玩家 (Row Player) 和列玩家 (Column Player) 的 CFR 求解器。
+    3. 进行 T 次迭代 (args.iteration_count):
+       - 生成当前策略 (next_strategy)。
+       - 计算效用 (utility)。
+       - 更新后悔值 (observe_utility)。
+       - 如果设置了 alternate，则交替更新；否则同时更新 (Simultaneous Updates)。
+    4. 定期计算可利用度 (Exploitability) 和博弈价值 (Value) 以监控收敛情况。
+    5. 保存结果数据和绘图。
+    
+    理论对应:
+    这是 doc_gpupt.md 中算法的顶层循环。
+    Loop 对应 Eq. 8 (平均后悔的迭代累积) 和 Eq. 10 (平均策略的迭代累积) 的逐步过程。
+    """
     args = parse_args()
     memory_pool = cp.get_default_memory_pool()
     pinned_memory_pool = cp.get_default_pinned_memory_pool()
