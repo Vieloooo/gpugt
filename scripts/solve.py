@@ -2,8 +2,37 @@ from argparse import ArgumentParser, BooleanOptionalAction
 from json import dump
 from pathlib import Path
 from resource import getrusage, RUSAGE_SELF
+import sys
 from sys import stdout
 from time import time
+
+
+def _bootstrap_local_submodules() -> None:
+    """Allow running this script without installing sibling submodules.
+
+    This repository vendors dependencies as git submodules under `projectroot/libs/*`.
+    When executing a script by path (e.g. `python scripts/solve.py`), Python will not
+    automatically add sibling submodules to `sys.path`, so imports like
+    `from noregret...` may fail.
+    """
+
+    this_file = Path(__file__).resolve()
+    project_root: Path | None = None
+    for parent in this_file.parents:
+        if parent.name == 'libs':
+            project_root = parent.parent
+            break
+
+    if project_root is None:
+        return
+
+    for rel in (Path('libs/nogret'), Path('libs/gpugt')):
+        candidate = (project_root / rel).resolve()
+        if candidate.exists() and str(candidate) not in sys.path:
+            sys.path.insert(0, str(candidate))
+
+
+_bootstrap_local_submodules()
 
 from noregret.utilities import import_string
 from tqdm import trange
