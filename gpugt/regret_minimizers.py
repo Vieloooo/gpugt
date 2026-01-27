@@ -132,6 +132,7 @@ class CounterfactualRegretMinimization(SequenceFormPolytopeRegretMinimizer):
     CFR+ 将累积后悔值与 0 取最大值 (max(0, R))，不允许后悔值长期为负。
     也就是论文中提到的 "CFR+ by Tammelin (2014) ... eliminates the averaging step while improving the convergence rate".
     (注：这里的实现保留了 observe_utility 中的 clip(0) 操作)
+    NOte the utility here is the terminal utility of this player observed from the game, given its opponents' strategies. 
     """
     def observe_utility(self, utility):
         super().observe_utility(utility)
