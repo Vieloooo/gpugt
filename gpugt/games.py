@@ -106,8 +106,8 @@ class MultiPlayerExtensiveFormGame(ExtensiveFormGame):
             shape = tuple(payload['shape'])
             if shape != (length, 1):
                 raise ValueError('unexpected sparse vector shape')
-            indptr = cp.asarray(payload['indptr'], dtype=cp.int64)
-            data = cp.asarray(payload['data'])
+            indptr = cp.asarray(payload['indptr'], dtype=cp.int32)
+            data = cp.asarray(payload['data'], dtype=cp.float32)
             out = cp.zeros(length, dtype=data.dtype)
             row_nnz = indptr[1:] - indptr[:-1]
             mask = row_nnz > 0
@@ -123,7 +123,7 @@ class MultiPlayerExtensiveFormGame(ExtensiveFormGame):
             if bool(utilities.get('zero_sum', False)):
                 raise ValueError('expected general-sum utilities, got zero-sum')
 
-            coords = cp.asarray(utilities['coords'], dtype=cp.int64)
+            coords = cp.asarray(utilities['coords'], dtype=cp.int32)
             nnz = int(coords.shape[0])
             payloads = list(utilities['values'])
             if len(payloads) != player_count:
@@ -154,7 +154,7 @@ class MultiPlayerExtensiveFormGame(ExtensiveFormGame):
                     coords_h[k][p] = int(seq_index[p][tuple(seqs[p])])
                     values_h[p][k] = float(vals[p])
 
-            coords = cp.asarray(coords_h, dtype=cp.int64)
+            coords = cp.asarray(coords_h, dtype=cp.int32)
             values = [cp.asarray(v, dtype=cp.float32) for v in values_h]
             return cls(tfsdps, {'coords': coords, 'values': values})
 
